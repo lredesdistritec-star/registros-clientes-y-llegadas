@@ -1,0 +1,402 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Netlink - Sistema de Gestión Operativa y Comercial</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Font Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Chart.js CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+    <!-- Configuración personalizada de Tailwind -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                    colors: {
+                        'netlink-bg': '#17191e',
+                        'netlink-panel': '#22252b',
+                        'netlink-green': '#65a30d',
+                        'netlink-green-hover': '#4d7c0f',
+                        'netlink-red': '#ef4444',
+                        'netlink-amber': '#f59e0b',
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <!-- Estilos personalizados compilados -->
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body class="flex h-screen w-full antialiased selection:bg-netlink-green selection:text-white">
+
+    <!-- SIDEBAR BARRA LATERAL -->
+    <aside class="w-64 bg-black flex-shrink-0 flex flex-col hidden md:flex border-r border-gray-800">
+        <!-- Badge Usuario -->
+        <div class="pt-6 pb-8 pr-4">
+            <div class="user-badge py-4 px-6 flex flex-col items-center justify-center relative">
+                <div class="flex items-center gap-2 font-bold text-xs uppercase tracking-wider text-center">
+                    <i class="fa-solid fa-user text-black"></i>
+                    <div>
+                        <span class="block text-black">BIENVENID@,</span>
+                        <span class="block text-black">JEHINS SMITH!</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Menú de Navegación -->
+        <nav class="flex-1 py-4 space-y-1 overflow-y-auto">
+            <a class="sidebar-item block py-3 px-4 text-gray-400 hover:text-gray-200 text-sm font-medium">
+                <i class="fa-solid fa-arrow-right-from-bracket mr-2 text-xs"></i> Cerrar sesión
+            </a>
+            <div class="my-2 border-t border-gray-800"></div>
+            <a class="sidebar-item block py-3 px-4 text-gray-400 hover:text-gray-200 text-sm font-medium">
+                <i class="fa-solid fa-house mr-2 text-xs"></i> Inicio
+            </a>
+            <a class="sidebar-item block py-3 px-4 text-gray-400 hover:text-gray-200 text-sm font-medium">
+                <i class="fa-solid fa-dollar-sign mr-2 text-xs"></i> Comercial
+            </a>
+            <a class="sidebar-item block py-3 px-4 text-gray-400 hover:text-gray-200 text-sm font-medium">
+                <i class="fa-solid fa-building mr-2 text-xs"></i> Sedes
+            </a>
+            <a class="sidebar-item block py-3 px-4 text-gray-400 hover:text-gray-200 text-sm font-medium">
+                <i class="fa-solid fa-dollar-sign mr-2 text-xs"></i> Referenciación - R
+            </a>
+            <a class="sidebar-item block py-3 px-4 text-gray-400 hover:text-gray-200 text-sm font-medium">
+                <i class="fa-solid fa-file-lines mr-2 text-xs"></i> Solicitudes TH
+            </a>
+
+            <!-- PESTAÑA 1: CONTROL DE TIEMPOS -->
+            <div onclick="switchTab('tiempos')" id="tabNavTiempos" class="sidebar-item active block py-3 px-4 text-sm font-medium">
+                <i class="fa-solid fa-clock mr-2 text-xs"></i> Control de Tiempos
+            </div>
+
+            <!-- PESTAÑA 2: VENTAS CAÍDAS -->
+            <div onclick="switchTab('ventas')" id="tabNavVentas" class="sidebar-item block py-3 px-4 text-gray-400 hover:text-gray-200 text-sm font-medium">
+                <i class="fa-solid fa-chart-line-down mr-2 text-xs"></i> Ventas Caídas
+            </div>
+
+            <a class="sidebar-item block py-3 px-4 text-gray-400 hover:text-gray-200 text-sm font-medium">
+                <i class="fa-solid fa-gem mr-2 text-xs"></i> Cumplimientos Sedes
+            </a>
+        </nav>
+    </aside>
+
+    <!-- ÁREA PRINCIPAL -->
+    <main class="flex-1 bg-netlink-bg p-4 md:p-8 overflow-y-auto">
+        
+        <!-- Header Móvil -->
+        <div class="md:hidden flex items-center justify-between mb-6 border-b border-gray-800 pb-3">
+            <div class="font-bold text-xs uppercase text-gray-300 flex items-center gap-2">
+                <i class="fa-solid fa-user text-netlink-green"></i> JEHINS SMITH
+            </div>
+            <div class="flex gap-2">
+                <button onclick="switchTab('tiempos')" class="px-2 py-1 text-xs bg-gray-800 rounded text-netlink-green">Tiempos</button>
+                <button onclick="switchTab('ventas')" class="px-2 py-1 text-xs bg-gray-800 rounded text-netlink-green">Ventas Caídas</button>
+            </div>
+        </div>
+
+        <!-- ================= MÓDULO 1: CONTROL DE TIEMPOS Y ASISTENCIA ================= -->
+        <section id="sectionTiempos" class="block space-y-6">
+            <div class="max-w-4xl mx-auto mt-2">
+                
+                <!-- Card Verificación de IP de Sede -->
+                <div class="bg-netlink-panel rounded-xl p-4 border border-gray-800 flex flex-col sm:flex-row items-center justify-between gap-4 mb-6">
+                    <div class="flex items-center gap-3">
+                        <div class="w-3 h-3 rounded-full bg-netlink-green animate-pulse"></div>
+                        <div>
+                            <span class="text-xs text-gray-400 block font-medium">Estado de Verificación de Red / IP:</span>
+                            <span class="text-sm font-bold text-white font-mono" id="ipStatusText">IP Sede: 190.158.42.10 (Autorizada - Sede Pereira Centro)</span>
+                        </div>
+                    </div>
+                    <span class="text-xs bg-green-950 text-netlink-green px-3 py-1 rounded-full border border-netlink-green/40 font-semibold flex items-center gap-1">
+                        <i class="fa-solid fa-shield-check"></i> Red Segura
+                    </span>
+                </div>
+
+                <!-- Card Principal Reloj y Controles -->
+                <div class="bg-netlink-panel rounded-xl shadow-2xl border border-gray-800 p-6 md:p-10 relative overflow-hidden">
+                    <div class="text-center mb-8">
+                        <h1 class="text-2xl md:text-3xl font-bold flex items-center justify-center gap-3 mb-2">
+                            <i class="fa-solid fa-stopwatch text-netlink-green"></i>
+                            <span class="text-netlink-green">Control de Asistencia y Registro de Jornada</span>
+                        </h1>
+                        <p class="text-gray-400 text-sm max-w-xl mx-auto">
+                            Horario oficial: Lun-Vie 9:30 AM - 6:00 PM (1h Almuerzo) | Sábados 9:00 AM - 1:00 PM.
+                            <br><span class="text-netlink-green text-xs font-semibold">Tolerancia permitida: ±3 minutos sobre la hora oficial.</span>
+                        </p>
+                        
+                        <!-- Reloj digital en vivo -->
+                        <div class="inline-block bg-black px-8 py-4 rounded-lg border border-gray-700 shadow-inner mt-6">
+                            <div id="liveClock" class="digital-clock text-4xl md:text-6xl font-bold text-netlink-green">00:00:00</div>
+                            <div id="liveDate" class="text-gray-400 text-xs md:text-sm mt-1 uppercase tracking-widest">Cargando fecha...</div>
+                        </div>
+                    </div>
+
+                    <!-- Botones Principales de Marcación -->
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-6 max-w-3xl mx-auto">
+                        <!-- Registrar Entrada -->
+                        <button onclick="iniciarMarcacion('ENTRADA')" class="action-card flex flex-col items-center justify-center p-6 rounded-xl outline-none group">
+                            <i class="fa-solid fa-right-to-bracket text-4xl text-netlink-green mb-3 group-hover:scale-110 transition-transform"></i>
+                            <span class="font-bold text-base text-netlink-green">Registrar Entrada</span>
+                            <span class="text-[11px] text-gray-500 mt-1">Inicio de Turno</span>
+                        </button>
+
+                        <!-- Registrar Permiso / Ausencia Temporal -->
+                        <button onclick="iniciarMarcacion('PERMISO')" class="action-card flex flex-col items-center justify-center p-6 rounded-xl outline-none group">
+                            <i class="fa-solid fa-user-clock text-4xl text-netlink-amber mb-3 group-hover:scale-110 transition-transform"></i>
+                            <span class="font-bold text-base text-netlink-amber">Permiso / Ausencia</span>
+                            <span class="text-[11px] text-gray-500 mt-1">Salida Temporal Autorizada</span>
+                        </button>
+
+                        <!-- Registrar Salida -->
+                        <button onclick="iniciarMarcacion('SALIDA')" class="action-card flex flex-col items-center justify-center p-6 rounded-xl outline-none group">
+                            <i class="fa-solid fa-right-from-bracket text-4xl text-netlink-green mb-3 group-hover:scale-110 transition-transform"></i>
+                            <span class="font-bold text-base text-netlink-green">Registrar Salida</span>
+                            <span class="text-[11px] text-gray-500 mt-1">Fin de Turno</span>
+                        </button>
+                    </div>
+
+                    <!-- Info institucional -->
+                    <div class="mt-10 text-center border-t border-gray-800 pt-4">
+                        <p class="text-xs text-gray-500 flex items-center justify-center gap-2">
+                            <i class="fa-solid fa-lock text-netlink-green"></i> 
+                            Marcación protegida por IP de Sede. Los registros extemporáneos requieren justificación para Talento Humano.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ================= MÓDULO 2: CONTROL DE VENTAS CAÍDAS ================= -->
+        <section id="sectionVentas" class="hidden space-y-8">
+            <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+                <div>
+                    <h1 class="text-2xl md:text-3xl font-bold text-white flex items-center gap-3">
+                        <i class="fa-solid fa-triangle-exclamation text-netlink-amber"></i>
+                        <span>Control de Ventas Caídas y Cuellos de Botella</span>
+                    </h1>
+                    <p class="text-gray-400 text-sm mt-1">Diagnóstico gerencial para medir el impacto real de las fallas operativas e interáreas.</p>
+                </div>
+                <button onclick="exportToCSV()" class="bg-netlink-panel hover:bg-gray-700 text-netlink-green border border-netlink-green/40 px-4 py-2 rounded-lg text-sm font-medium transition flex items-center gap-2">
+                    <i class="fa-solid fa-file-excel"></i> Exportar Reporte Gerencial
+                </button>
+            </div>
+
+            <!-- KPIs -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                <div class="bg-netlink-panel p-5 rounded-xl border border-gray-800">
+                    <p class="text-xs text-gray-400 uppercase font-semibold">Total Ventas Caídas</p>
+                    <h3 id="kpiTotalCount" class="text-3xl font-bold text-white mt-1">0</h3>
+                </div>
+                <div class="bg-netlink-panel p-5 rounded-xl border border-gray-800">
+                    <p class="text-xs text-gray-400 uppercase font-semibold">Valor Total Perdido</p>
+                    <h3 id="kpiTotalValue" class="text-2xl font-bold text-red-400 mt-1">$ 0</h3>
+                </div>
+                <div class="bg-netlink-panel p-5 rounded-xl border border-gray-800">
+                    <p class="text-xs text-gray-400 uppercase font-semibold">Monto Recuperable</p>
+                    <h3 id="kpiRecoverableValue" class="text-2xl font-bold text-netlink-amber mt-1">$ 0</h3>
+                </div>
+                <div class="bg-netlink-panel p-5 rounded-xl border border-gray-800">
+                    <p class="text-xs text-gray-400 uppercase font-semibold">Etapa Más Crítica</p>
+                    <h3 id="kpiCriticalStage" class="text-sm font-bold text-netlink-green mt-2 truncate">Analizando...</h3>
+                </div>
+            </div>
+
+            <!-- FORM + CHART -->
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+                <!-- Formulario -->
+                <div class="lg:col-span-5 bg-netlink-panel p-6 rounded-xl border border-gray-800 shadow-2xl">
+                    <h2 class="text-lg font-bold text-white mb-4 border-b border-gray-800 pb-2">Registrar Novedad de Venta</h2>
+                    <form id="lostSaleForm" onsubmit="handleFormSubmit(event)" class="space-y-4">
+                        <div class="grid grid-cols-2 gap-3">
+                            <div>
+                                <label class="block text-xs text-gray-400 mb-1">Cliente *</label>
+                                <input type="text" id="clientName" required placeholder="Nombre cliente" class="w-full bg-netlink-bg border border-gray-700 rounded p-2 text-xs text-white">
+                            </div>
+                            <div>
+                                <label class="block text-xs text-gray-400 mb-1">Cédula *</label>
+                                <input type="text" id="clientId" required placeholder="Cédula" class="w-full bg-netlink-bg border border-gray-700 rounded p-2 text-xs text-white">
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-2 gap-3">
+                            <div>
+                                <label class="block text-xs text-gray-400 mb-1">Teléfono *</label>
+                                <input type="text" id="clientPhone" required placeholder="Teléfono" class="w-full bg-netlink-bg border border-gray-700 rounded p-2 text-xs text-white">
+                            </div>
+                            <div>
+                                <label class="block text-xs text-gray-400 mb-1">Producto *</label>
+                                <input type="text" id="productRef" required placeholder="Ej: iPhone 15" class="w-full bg-netlink-bg border border-gray-700 rounded p-2 text-xs text-white">
+                            </div>
+                        </div>
+
+                        <div>
+                            <label class="block text-xs text-gray-400 mb-1">Valor Venta ($ COP) *</label>
+                            <input type="number" id="saleValue" required min="1000" step="1000" placeholder="Ej: 3500000" class="w-full bg-netlink-bg border border-gray-700 rounded p-2 text-xs text-white">
+                        </div>
+
+                        <div>
+                            <label class="block text-xs text-gray-400 mb-1">Etapa de Caída / Causa Raíz *</label>
+                            <select id="lossStage" required class="w-full bg-netlink-bg border border-gray-700 rounded p-2 text-xs text-white">
+                                <option value="" disabled selected>-- Seleccione etapa --</option>
+                                <option value="Referenciación / Cartera">1. Referenciación / Cartera</option>
+                                <option value="Gestión en Sede / Tienda">2. Gestión en Sede / Tienda</option>
+                                <option value="Enrolamiento / Plataforma">3. Enrolamiento / Plataforma Financiera</option>
+                                <option value="Logística / Envío">4. Logística / Envío</option>
+                                <option value="Desistimiento Directo">5. Desistimiento Directo</option>
+                            </select>
+                        </div>
+
+                        <div>
+                            <label class="block text-xs text-gray-400 mb-1">Resumen de la Gestión Comercial *</label>
+                            <textarea id="managementSummary" rows="3" required placeholder="¿Qué ocurrió en el proceso?" class="w-full bg-netlink-bg border border-gray-700 rounded p-2 text-xs text-white resize-none"></textarea>
+                        </div>
+
+                        <div>
+                            <label class="block text-xs text-gray-400 mb-1">Estado de la Oportunidad</label>
+                            <div class="grid grid-cols-2 gap-3">
+                                <label class="flex items-center gap-2 p-2 bg-netlink-bg border border-gray-700 rounded cursor-pointer">
+                                    <input type="radio" name="saleStatus" value="Perdida Definitiva" checked class="text-netlink-green">
+                                    <span class="text-xs text-red-400 font-semibold">Perdida Definitiva</span>
+                                </label>
+                                <label class="flex items-center gap-2 p-2 bg-netlink-bg border border-gray-700 rounded cursor-pointer">
+                                    <input type="radio" name="saleStatus" value="En Seguimiento" class="text-netlink-green">
+                                    <span class="text-xs text-netlink-amber font-semibold">En Seguimiento</span>
+                                </label>
+                            </div>
+                        </div>
+
+                        <button type="submit" class="w-full py-3 bg-netlink-green hover:bg-netlink-green-hover text-white font-bold rounded text-xs transition">
+                            <i class="fa-solid fa-floppy-disk mr-1"></i> Registrar Venta Caída
+                        </button>
+                    </form>
+                </div>
+
+                <!-- Gráfico Pareto -->
+                <div class="lg:col-span-7 bg-netlink-panel p-6 rounded-xl border border-gray-800 shadow-2xl flex flex-col justify-between">
+                    <div>
+                        <h2 class="text-lg font-bold text-white mb-4 border-b border-gray-800 pb-2">Pérdida Económica Acumulada por Etapa</h2>
+                        <div class="relative h-64 w-full">
+                            <canvas id="paretoChart"></canvas>
+                        </div>
+                    </div>
+                    <div class="mt-4 p-4 bg-black/40 border-l-4 border-netlink-amber rounded">
+                        <p class="text-xs text-gray-300">
+                            <strong>Sustento Técnico:</strong> Permite demostrar objetivamente a Gerencia cómo las fallas en plataforma, cartera o sedes reducen el cumplimiento global de metas.
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tabla de Registros -->
+            <div class="bg-netlink-panel p-6 rounded-xl border border-gray-800 shadow-2xl">
+                <div class="flex flex-col sm:flex-row justify-between items-center gap-4 mb-4 border-b border-gray-800 pb-3">
+                    <h2 class="text-lg font-bold text-white">Historial de Registros</h2>
+                    <div class="flex gap-2">
+                        <input type="text" id="tableSearch" onkeyup="filterTable()" placeholder="Buscar cliente..." class="bg-netlink-bg border border-gray-700 rounded px-3 py-1 text-xs text-white">
+                        <select id="filterStage" onchange="filterTable()" class="bg-netlink-bg border border-gray-700 rounded px-2 py-1 text-xs text-white">
+                            <option value="ALL">Todas las Etapas</option>
+                            <option value="Referenciación / Cartera">Referenciación / Cartera</option>
+                            <option value="Gestión en Sede / Tienda">Gestión en Sede / Tienda</option>
+                            <option value="Enrolamiento / Plataforma">Enrolamiento / Plataforma</option>
+                            <option value="Logística / Envío">Logística / Envío</option>
+                            <option value="Desistimiento Directo">Desistimiento Directo</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left border-collapse text-xs">
+                        <thead>
+                            <tr class="bg-black/50 text-gray-400 uppercase border-b border-gray-800">
+                                <th class="p-3">Fecha</th>
+                                <th class="p-3">Cliente</th>
+                                <th class="p-3">Producto</th>
+                                <th class="p-3">Valor</th>
+                                <th class="p-3">Etapa</th>
+                                <th class="p-3">Gestión</th>
+                                <th class="p-3">Estado</th>
+                                <th class="p-3 text-center">Acción</th>
+                            </tr>
+                        </thead>
+                        <tbody id="recordsTableBody" class="divide-y divide-gray-800">
+                            <!-- Datos dinámicos -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- MODAL 1: NOTIFICACIÓN A TIEMPO / VERDE -->
+    <div id="modalNormal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/75 backdrop-blur-sm opacity-0 pointer-events-none transition-opacity duration-300">
+        <div class="bg-netlink-panel border border-netlink-green rounded-xl p-6 max-w-sm w-full text-center shadow-2xl">
+            <div class="w-14 h-14 bg-green-950 border border-netlink-green rounded-full flex items-center justify-center mx-auto mb-3">
+                <i class="fa-solid fa-circle-check text-netlink-green text-2xl"></i>
+            </div>
+            <h3 class="text-lg font-bold text-white mb-1" id="normalModalTitle">Registro Exitoso</h3>
+            <p class="text-xs text-gray-300 mb-4" id="normalModalMsg">Tu marcación ha sido procesada correctamente dentro de la jornada.</p>
+            <div class="bg-black/60 p-2 rounded text-[11px] font-mono text-netlink-green mb-5 border border-gray-800" id="normalModalTime">
+                Hora: --:--:--
+            </div>
+            <button onclick="closeModal('modalNormal')" class="w-full py-2 bg-netlink-green hover:bg-netlink-green-hover text-white text-xs font-bold rounded transition">
+                Aceptar
+            </button>
+        </div>
+    </div>
+
+    <!-- MODAL 2: ALERTA TARDANZA / EXTANZA EN ROJO Y SELECCIÓN DE MOTIVO -->
+    <div id="modalJustificación" class="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm opacity-0 pointer-events-none transition-opacity duration-300">
+        <div class="bg-netlink-panel border border-red-500 rounded-xl p-6 max-w-md w-full shadow-2xl">
+            <div class="flex items-center gap-3 border-b border-gray-800 pb-3 mb-4">
+                <div class="w-10 h-10 bg-red-950 border border-red-500 rounded-full flex items-center justify-center text-red-500 font-bold text-lg">
+                    <i class="fa-solid fa-triangle-exclamation"></i>
+                </div>
+                <div>
+                    <h3 class="text-base font-bold text-red-400" id="justifModalTitle">Alerta de Registro Extemporáneo</h3>
+                    <p class="text-xs text-gray-400" id="justifModalSubtitle">Marcación fuera del rango de tolerancia permitido.</p>
+                </div>
+            </div>
+
+            <div class="space-y-4">
+                <div class="bg-red-950/40 border border-red-500/30 p-3 rounded text-xs text-gray-200" id="justifAlertText">
+                    Has marcado fuera del horario estipulado (Tolerancia: ±3 min). Debes justificar el motivo para TH.
+                </div>
+
+                <div>
+                    <label class="block text-xs font-semibold text-gray-300 mb-2">Selecciona el Motivo Justificado *</label>
+                    <select id="reasonSelect" class="w-full bg-netlink-bg border border-gray-700 rounded p-2.5 text-xs text-white focus:outline-none focus:border-red-500">
+                        <!-- Opciones dinámicas cargadas por JS segun la accion -->
+                    </select>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-semibold text-gray-300 mb-1">Detalle Adicional / Observaciones (Opcional)</label>
+                    <textarea id="reasonDetail" rows="2" placeholder="Agrega una nota adicional si aplica..." class="w-full bg-netlink-bg border border-gray-700 rounded p-2 text-xs text-white resize-none"></textarea>
+                </div>
+
+                <div class="flex gap-2 pt-2">
+                    <button onclick="confirmarJustificacion()" class="w-full py-2.5 bg-red-600 hover:bg-red-700 text-white text-xs font-bold rounded transition">
+                        Guardar Registro con Justificación
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- SCRIPT JS PRINCIPAL -->
+    <script src="app.js"></script>
+</body>
+</html>

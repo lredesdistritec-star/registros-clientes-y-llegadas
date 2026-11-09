@@ -1,0 +1,94 @@
+/* ESTILOS PERSONALIZADOS NETLINK */
+body {
+    background-color: #17191e;
+    color: #ffffff;
+    font-family: 'Inter', sans-serif;
+    overflow-x: hidden;
+}
+
+/* Items de Navegación Lateral */
+.sidebar-item {
+    position: relative;
+    padding-left: 2rem;
+    transition: all 0.3s ease;
+    cursor: pointer;
+}
+
+.sidebar-item::before {
+    content: '';
+    position: absolute;
+    left: 0.75rem;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 4px;
+    height: 4px;
+    background-color: #65a30d;
+    border-radius: 50%;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.sidebar-item:hover::before,
+.sidebar-item.active::before {
+    opacity: 1;
+}
+
+.sidebar-item.active {
+    color: #65a30d;
+    background-color: rgba(255, 255, 255, 0.05);
+    border-left: 3px solid #65a30d;
+}
+
+/* Badge de Usuario */
+.user-badge {
+    background: #e5e7eb;
+    color: #000000;
+    border-top-right-radius: 20px;
+    border-bottom-right-radius: 20px;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.5);
+}
+
+/* Tarjetas de Acción */
+.action-card {
+    background-color: transparent;
+    border: 1px solid #374151;
+    transition: all 0.3s ease;
+}
+
+.action-card:hover {
+    border-color: #65a30d;
+    background-color: rgba(101, 163, 13, 0.05);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(101, 163, 13, 0.15);
+}
+
+/* Fuente Reloj Digital */
+@font-face {
+    font-family: 'Digital';
+    src: url('https://fonts.cdnfonts.com/s/17392/DS-DIGI.woff') format('woff');
+}
+
+.digital-clock {
+    font-family: 'Digital', 'Inter', monospace;
+    letter-spacing: 2px;
+    text-shadow: 0 0 10px rgba(101, 163, 13, 0.3);
+}
+
+/* Scrollbar Personalizada */
+::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+}
+
+::-webkit-scrollbar-track {
+    background: #17191e;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #374151;
+    border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #65a30d;
+}
